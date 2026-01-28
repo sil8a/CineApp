@@ -3,20 +3,47 @@ package modelo;
 public class Sala {
     private String idSala;
     private String nombre;
+    private int capacidad;
+    
+	public Sala(String idSala, String nombre, int capacidad) {
+	
+		this.idSala = idSala;
+		this.nombre = nombre;
+		this.capacidad = capacidad;
+	}
 
-    public Sala(String idSala, String nombre) {
-        this.idSala = idSala;
-        this.nombre = nombre;
-    }
+	public String getIdSala() {
+		return idSala;
+	}
 
-    public String getIdSala() { return idSala; }
-    public void setIdSala(String idSala) { this.idSala = idSala; }
+	public void setIdSala(String idSala) {
+		this.idSala = idSala;
+	}
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+	public String getNombre() {
+		return nombre;
+	}
 
-    @Override
-    public String toString() {
-        return nombre;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public int getCapacidad() {
+		return capacidad;
+	}
+
+	public void setCapacidad(int capacidad) {
+		this.capacidad = capacidad;
+	}
+
+	@Override
+	public String toString() {
+		return "Sala [idSala=" + idSala + ", nombre=" + nombre + ", capacidad=" + capacidad + "]";
+	}
+    
+    
+    
+    
 }
+
+  
