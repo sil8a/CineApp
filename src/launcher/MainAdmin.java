@@ -3,7 +3,7 @@ package launcher;
 import controlador.ControladorCine;
 import vista.VistaConsola;
 
-public class Main {
+public class MainAdmin {
     public static void main(String[] args) {
         // 1. Crear la Vista
         VistaConsola vista = new VistaConsola();

@@ -1,37 +1,28 @@
 package controlador;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
 import modelo.Pelicula;
 
-import java.io.File; // <--- IMPORTANTE: Añadir esto
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.time.LocalDateTime;
-
 public class GeneradorTicket {
 
     public static void guardarFactura(Pelicula p, int cantidad) {
         
-        // 1. Definimos el nombre de la carpeta y del archivo
         String nombreCarpeta = "tickets";
         String nombreArchivo = "ticket_" + p.getTitulo().replace(" ", "_") + ".txt";
 
-        // 2. NUEVO: Creamos el objeto File para la carpeta
         File carpeta = new File(nombreCarpeta);
 
-        // 3. NUEVO: Si la carpeta NO existe, la creamos
         if (!carpeta.exists()) {
-            carpeta.mkdir(); // mkdir = make directory (crear directorio)
+            carpeta.mkdir();
         }
 
-        // 4. Preparamos la ruta completa (carpeta/archivo.txt)
         File archivoFinal = new File(carpeta, nombreArchivo);
 
         try {
-            // Pasamos el objeto 'archivoFinal' al FileWriter
             FileWriter fw = new FileWriter(archivoFinal);
             PrintWriter pw = new PrintWriter(fw);
 
@@ -53,7 +44,6 @@ public class GeneradorTicket {
 
             pw.close(); 
             
-            // Avisamos dónde se ha guardado
             System.out.println("📄 Ticket guardado en la carpeta '" + nombreCarpeta + "': " + nombreArchivo);
 
         } catch (Exception e) {

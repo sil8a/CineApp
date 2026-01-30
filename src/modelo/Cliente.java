@@ -1,70 +1,68 @@
 package modelo;
 
-import java.security.MessageDigest;
-import java.util.Base64;
-
 public class Cliente {
+    
     private String dni;
     private String nombre;
     private String apellidos;
     private String email;
-    private String contrasena; // Aquí guardaremos la encriptada
+    private String contrasena;
 
-    // Constructor normal
+    // Constructor vacío
+    public Cliente() {}
+
+    // Constructor usado en registro y login
     public Cliente(String dni, String nombre, String apellidos, String email, String contrasena) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.email = email;
-        this.contrasena = contrasena; // Ojo: Aquí debería llegar ya encriptada o encriptarla tú
-    }
-    
-    // MÉTODO ESTÁTICO: Úsalo para convertir "1234" en "A8F3..."
-    public static String encriptar(String texto) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(texto.getBytes("UTF-8"));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error al encriptar", ex);
-        }
+        this.contrasena = contrasena;
     }
 
-    // Getters y Setters...
-    
-    public String getDni() { return dni; }
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
     public String getNombre() {
-		return nombre;
-	}
+        return nombre;
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public String getApellidos() {
-		return apellidos;
-	}
+    public String getApellidos() {
+        return apellidos;
+    }
 
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
-	}
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
+    public String getContrasena() {
+        return contrasena;
+    }
 
-	public void setContrasena(String contrasena) {
-		this.contrasena = contrasena;
-	}
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
 
-	public String getContrasena() { return contrasena; }
-   
+    @Override
+    public String toString() {
+        return "Cliente [dni=" + dni + ", nombre=" + nombre + ", apellidos=" + apellidos 
+                + ", email=" + email + ", contrasena=" + contrasena + "]";
+    }
 }

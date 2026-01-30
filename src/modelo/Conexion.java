@@ -22,10 +22,10 @@ public class Conexion {
             System.out.println(" Conexión establecida con éxito.");
             
         } catch (ClassNotFoundException e) {
-            System.out.println("❌ Error: No encuentro el archivo .jar (Driver).");
+            System.out.println(" Error: No encuentro el archivo .jar (Driver).");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("❌ Error: No puedo conectarme a XAMPP (revisa si está encendido MySQL).");
+            System.out.println(" Error: No puedo conectarme a XAMPP (revisa si está encendido MySQL).");
             e.printStackTrace();
         }
         return con;

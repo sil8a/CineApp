@@ -4,18 +4,24 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Sesion {
-    private String idSesion;
-    private LocalDate fecha;        // Para el campo 'date' de SQL
-    private LocalTime horaInicio;   // Para el campo 'time' de SQL
-    private LocalTime horaFin;      
-    private String idSala;          // Guardamos el ID de la sala
-    private String idPelicula;      // Guardamos el ID de la película
-    private int espectadores;
-    private double precioSesion;
 
-    // Constructor
-    public Sesion(String idSesion, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin, 
+    private String idSesion;
+    private LocalDate fecha;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
+    private String idSala;
+    private String idPelicula;
+    private int espectadores;      // Personas que ya han comprado
+    private double precioSesion;   // Precio por persona
+
+    // ---------------------------------------------------------
+    // CONSTRUCTORES
+    // ---------------------------------------------------------
+    public Sesion() {}
+
+    public Sesion(String idSesion, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin,
                   String idSala, String idPelicula, int espectadores, double precioSesion) {
+
         this.idSesion = idSesion;
         this.fecha = fecha;
         this.horaInicio = horaInicio;
@@ -26,7 +32,23 @@ public class Sesion {
         this.precioSesion = precioSesion;
     }
 
-    // Getters y Setters
+    // ---------------------------------------------------------
+    // MÉTODOS ÚTILES
+    // ---------------------------------------------------------
+
+    /** Devuelve la fecha y hora en formato bonito */
+    public String getFechaHora() {
+        return fecha.toString() + " " + horaInicio.toString();
+    }
+
+    /** Incrementa espectadores tras una compra */
+    public void sumarEspectadores(int cantidad) {
+        this.espectadores += cantidad;
+    }
+
+    // ---------------------------------------------------------
+    // GETTERS Y SETTERS
+    // ---------------------------------------------------------
     public String getIdSesion() { return idSesion; }
     public void setIdSesion(String idSesion) { this.idSesion = idSesion; }
 
@@ -51,8 +73,23 @@ public class Sesion {
     public double getPrecioSesion() { return precioSesion; }
     public void setPrecioSesion(double precioSesion) { this.precioSesion = precioSesion; }
 
-    @Override
+	
+
+    // ---------------------------------------------------------
+    // TO STRING (para mostrar sesiones en consola)
+    // ---------------------------------------------------------
+   /* @Override
     public String toString() {
-        return "Sesión " + idSesion + " - " + fecha + " a las " + horaInicio;
-    }
+        return "[" + idSesion + "] " +
+               fecha + " " + horaInicio +
+               " | Sala: " + idSala +
+               " | Película: " + idPelicula +
+               " | Precio: " + precioSesion + "€";
+    }*/
+    @Override
+	public String toString() {
+		return "Sesion [idSesion=" + idSesion + ", fecha=" + fecha + ", horaInicio=" + horaInicio + ", horaFin="
+				+ horaFin + ", idSala=" + idSala + ", idPelicula=" + idPelicula + ", espectadores=" + espectadores
+				+ ", precioSesion=" + precioSesion + "]";
+	} 
 }

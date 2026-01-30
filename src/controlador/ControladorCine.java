@@ -3,6 +3,7 @@ package controlador;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import modelo.Conexion;
 import modelo.Pelicula;
@@ -10,178 +11,192 @@ import vista.VistaConsola;
 
 public class ControladorCine {
     
-    private VistaConsola vista; // Ahora usamos la vista de consola
+    private VistaConsola vista;
 
-    // Constructor
     public ControladorCine(VistaConsola vista) {
         this.vista = vista;
     }
 
-    // Método principal para arrancar la lógica
+    // --- MENÚ PRINCIPAL DE GESTIÓN (ADMIN) ---
     public void iniciar() {
         int opcion = 0;
         
-        // El bucle se repite mientras NO elijas la opción 5
         while (opcion != 5) {
-            opcion = vista.mostrarMenu();
+            vista.mostrarMensaje("\n===============================");
+            vista.mostrarMensaje("    GESTIÓN DE CINE (ADMIN)   ");
+            vista.mostrarMensaje("===============================");
+            vista.mostrarMensaje("1. Ver cartelera");
+            vista.mostrarMensaje("2. Insertar nueva película");
+            vista.mostrarMensaje("3. Actualizar precio");
+            vista.mostrarMensaje("4. Borrar película");
+            vista.mostrarMensaje("5. Volver / Salir");
+            
+            opcion = vista.pedirInt("Elige una opción");
 
             switch (opcion) {
-                case 1: // VER
+                case 1: 
                     mostrarPeliculas();
                     break;
-                    
-                case 2: // INSERTAR
-                    vista.mostrarMensaje("--- NUEVA PELÍCULA ---");
-                    String id = vista.pedirDato("Dime el ID (ej: N01)");
-                    String tit = vista.pedirDato("Título");
-                    int dur = vista.pedirInt("Duración (minutos)");
-                    String gen = vista.pedirDato("Género");
-                    double pre = vista.pedirDouble("Precio");
-                    
-                    Pelicula p = new Pelicula(id, tit, dur, gen, pre);
-                    registrarPelicula(p);
+                case 2: 
+                    registrarPelicula();
                     break;
-                    
-                case 3: // ACTUALIZAR
-                    vista.mostrarMensaje("--- CAMBIAR PRECIO ---");
-                    String idMod = vista.pedirDato("ID de la película a cambiar");
-                    double nuevoPre = vista.pedirDouble("Nuevo precio");
-                    actualizarPrecio(idMod, nuevoPre);
+                case 3: 
+                    actualizarPrecio();
                     break;
-
-                case 4: // BORRAR
-                    vista.mostrarMensaje("--- BORRAR PELÍCULA ---");
-                    String idBorrar = vista.pedirDato("ID de la película a eliminar");
-                    borrarPelicula(idBorrar);
+                case 4: 
+                    borrarPelicula();
                     break;
-                    
                 case 5:
-                    vista.mostrarMensaje("¡Adiós! 👋");
+                    vista.mostrarMensaje("Saliendo del modo gestión...");
                     break;
-                    
                 default:
-                    vista.mostrarMensaje("Opción no válida.");
+                    vista.mostrarMensaje(" Opción no válida.");
             }
         }
     }
 
+    // --- 1. VER PELÍCULAS (SELECT) ---
     private void mostrarPeliculas() {
         Connection con = Conexion.conectar();
         
-        // Si la conexión falla, avisamos y salimos
         if (con == null) {
-            vista.mostrarMensaje("Error: No hay conexión con la base de datos.");
+            vista.mostrarMensaje(" Error: No hay conexión con la base de datos.");
             return;
         }
 
         String sql = "SELECT * FROM pelicula";
-        StringBuilder textoFinal = new StringBuilder();
-
+        
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
+            vista.mostrarMensaje("\n---  CARTELERA ACTUAL ---");
+            boolean hayDatos = false;
+
             while (rs.next()) {
+                hayDatos = true;
+                String id = rs.getString("id_pelicula");
                 String titulo = rs.getString("titulo");
                 int duracion = rs.getInt("duracion");
+                String genero = rs.getString("genero");
                 double precio = rs.getDouble("precio_base");
 
-                // Formateamos el texto: Título - Duración - Precio
-                String linea = String.format("* %s (%d min) -> %.2f euros\n", titulo, duracion, precio);
-                textoFinal.append(linea);
+                // Formato bonito: [ID] Titulo (Duracion) - Genero : Precio
+                System.out.println(String.format("[%s] %-20s (%d min) | %s | %.2f€", 
+                                    id, titulo, duracion, genero, precio));
             }
-            
-            // Enviamos el texto acumulado a la VISTA para que ella lo imprima
-            vista.mostrarListado(textoFinal.toString());
+
+            if (!hayDatos) {
+                vista.mostrarMensaje(" No hay películas registradas.");
+            }
             
             con.close();
 
         } catch (Exception ex) {
-            ex.printStackTrace(); // Esto muestra el error técnico en rojo si pasa algo raro
+            vista.mostrarMensaje(" Error al listar: " + ex.getMessage());
         }
-        
-        
     }
-    
-    //----------------------------------------------------
-    //----------------------------------------------------
-  //Estaparte es nueva es lo que ha puesto ALEJANDRo  
- // Método para INSERTAR una película nueva en la base de dato NUEVO que ha dicho Alejandro
-    public void registrarPelicula(Pelicula p) {
-        Connection con = Conexion.conectar();
+
+    // --- 2. INSERTAR PELÍCULA (INSERT) ---
+    private void registrarPelicula() {
+        vista.mostrarMensaje("\n--- ➕ NUEVA PELÍCULA ---");
         
-        // La interrogación (?) es un hueco que rellenaremos después
+        // Pedimos los datos
+        String id = vista.pedirDato("ID (ej: P01)");
+        String titulo = vista.pedirDato("Título");
+        int duracion = vista.pedirInt("Duración (minutos)");
+        String genero = vista.pedirDato("Género");
+        double precio = vista.pedirDouble("Precio Base");
+        
+        // Creamos el objeto Pelicula
+        Pelicula p = new Pelicula(id, titulo, duracion, genero, precio);
+
+        Connection con = Conexion.conectar();
         String sql = "INSERT INTO pelicula (id_pelicula, titulo, duracion, genero, precio_base) VALUES (?, ?, ?, ?, ?)";
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             
-            // Rellenamos los huecos (?) con los datos del objeto Pelicula
             ps.setString(1, p.getIdPelicula());
             ps.setString(2, p.getTitulo());
             ps.setInt(3, p.getDuracion());
             ps.setString(4, p.getGenero());
             ps.setDouble(5, p.getPrecioBase());
 
-            // EJECUTAMOS la inserción
             int filasAfectadas = ps.executeUpdate();
             
             if (filasAfectadas > 0) {
-                vista.mostrarMensaje("¡Éxito! Película guardada: " + p.getTitulo());
+                vista.mostrarMensaje(" ¡Éxito! Película guardada: " + p.getTitulo());
             }
 
             con.close();
 
         } catch (Exception ex) {
-            vista.mostrarMensaje("❌ Error al guardar la película. (¿Quizás el ID ya existe?)");
-            ex.printStackTrace();
+            vista.mostrarMensaje(" Error al guardar. ¿Quizás el ID '" + id + "' ya existe?");
         }
     }
-  //-------------------------------------------------------  
-    //-------------------------------------------------------  
-    //------------------------------------------------------- 
-    
- // MÉTODO ACTUALIZAR (UPDATE): Cambia el precio de una película
-    public void actualizarPrecio(String idPelicula, double nuevoPrecio) {
+
+    // --- 3. ACTUALIZAR PRECIO (UPDATE) ---
+    private void actualizarPrecio() {
+        vista.mostrarMensaje("\n---  CAMBIAR PRECIO ---");
+        // Mostramos la lista primero para ayudar al usuario a ver los IDs
+        mostrarPeliculas(); 
+
+        String id = vista.pedirDato("Escribe el ID de la película a cambiar");
+        double nuevoPrecio = vista.pedirDouble("Nuevo precio");
+        
         Connection con = Conexion.conectar();
         String sql = "UPDATE pelicula SET precio_base = ? WHERE id_pelicula = ?";
         
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setDouble(1, nuevoPrecio);
-            ps.setString(2, idPelicula);
+            ps.setString(2, id);
             
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                vista.mostrarMensaje("✅ Precio actualizado correctamente.");
+                vista.mostrarMensaje(" Precio actualizado correctamente.");
             } else {
-                vista.mostrarMensaje("❌ No encontré ninguna película con ese ID.");
+                vista.mostrarMensaje(" No encontré ninguna película con el ID: " + id);
             }
             con.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            vista.mostrarMensaje(" Error al actualizar: " + e.getMessage());
         }
     }
 
-    // MÉTODO BORRAR (DELETE): Elimina una película
-    public void borrarPelicula(String idPelicula) {
+    // --- 4. BORRAR PELÍCULA (DELETE) ---
+    private void borrarPelicula() {
+        vista.mostrarMensaje("\n---  BORRAR PELÍCULA ---");
+        mostrarPeliculas();
+
+        String id = vista.pedirDato("Escribe el ID de la película a eliminar");
+        
+        // Confirmación de seguridad
+        String confirmacion = vista.pedirDato("¿Estás seguro? (s/n)");
+        if (!confirmacion.equalsIgnoreCase("s")) {
+            vista.mostrarMensaje("Operación cancelada.");
+            return;
+        }
+
         Connection con = Conexion.conectar();
         String sql = "DELETE FROM pelicula WHERE id_pelicula = ?";
         
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, idPelicula);
+            ps.setString(1, id);
             
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                vista.mostrarMensaje("🗑️ Película eliminada.");
+                vista.mostrarMensaje(" Película eliminada correctamente.");
             } else {
-                vista.mostrarMensaje("❌ No existe ese ID para borrar.");
+                vista.mostrarMensaje(" No existe ese ID.");
             }
             con.close();
-        } catch (Exception e) {
-            vista.mostrarMensaje("❌ No se puede borrar (quizás tiene sesiones asignadas).");
+        } catch (SQLException e) {
+            // Este error suele saltar por integridad referencial (Foreign Keys)
+            vista.mostrarMensaje("     Error crítico: No se puede borrar esta película.");
+            vista.mostrarMensaje("Posible causa: Ya tiene sesiones programadas o entradas vendidas.");
         }
     } 
-    
 }

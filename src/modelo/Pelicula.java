@@ -8,14 +8,7 @@ public class Pelicula {
     private String genero;      // varchar(30) en SQL
     private double precioBase;  // decimal(6,2) en SQL
     
-    /**
-     * Constructor principal de la Clase Pelicula.
-     * @param idPelicula El código único de la pelicula
-     * @param titulo El nombre comercial de la pelicula
-     * @param duracion La duración en minutos
-     * @param genero puede ser (terror, Comedia, etc)
-     * @param precioBase El precio estándar por entrada
-     */
+   
 
     // 2. Constructor (Sirve para crear nuevas películas)
     public Pelicula(String idPelicula, String titulo, int duracion, String genero, double precioBase) {
@@ -42,9 +35,16 @@ public class Pelicula {
     public double getPrecioBase() { return precioBase; }
     public void setPrecioBase(double precioBase) { this.precioBase = precioBase; }
 
+	
+
     // Método toString 
-    @Override
+   /* @Override
     public String toString() {
         return titulo + " (" + duracion + " min)";
-    }
+    }*/
+    @Override
+	public String toString() {
+		return "Pelicula [idPelicula=" + idPelicula + ", titulo=" + titulo + ", duracion=" + duracion + ", genero="
+				+ genero + ", precioBase=" + precioBase + "]";
+	} 
 }
